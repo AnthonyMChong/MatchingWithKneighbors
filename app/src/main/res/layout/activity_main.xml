@@ -14,11 +14,10 @@
         android:id="@+id/DegreeOut"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/SimBecVal2"
+        android:text="TextView"
+        android:layout_below="@+id/stop_updates_button"
         android:layout_alignParentEnd="true"
-        android:layout_below="@+id/SimBecVal1"
-        android:layout_toEndOf="@+id/SaveButton"
-        android:text="TextView" />
+        android:layout_alignStart="@+id/RadiusOut" />
 
     <Button
         android:text="Scan"
@@ -43,9 +42,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/textView4"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentStart="true"
-        android:layout_marginBottom="114dp" />
+        android:layout_above="@+id/SaveButton"
+        android:layout_alignParentStart="true" />
 
     <TextView
         android:text="TextView"
@@ -80,8 +78,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/textView"
-        android:layout_centerVertical="true"
-        android:layout_alignParentStart="true" />
+        android:layout_above="@+id/textView2"
+        android:layout_alignParentStart="true"
+        android:layout_marginBottom="26dp" />
 
     <EditText
         android:text="-"
@@ -110,9 +109,9 @@
         android:layout_height="wrap_content"
         android:inputType="numberSigned"
         android:id="@+id/SimBecVal3"
-        android:layout_above="@+id/textView"
+        android:layout_below="@+id/SimBecVal2"
         android:layout_alignParentStart="true"
-        android:layout_marginBottom="19dp"
+        android:layout_marginTop="30dp"
         android:layout_alignEnd="@+id/SimBecVal2" />
 
     <TextView
@@ -120,9 +119,18 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="TextView"
-        android:layout_alignBottom="@+id/SimBecVal3"
-        android:layout_alignParentEnd="true"
+        android:layout_alignBaseline="@+id/SimBecVal2"
+        android:layout_alignBottom="@+id/SimBecVal2"
+        android:layout_alignParentEnd="true" />
+
+    <TextView
+        android:id="@+id/CartText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="TextView"
         android:layout_alignTop="@+id/SimBecVal3"
-        android:layout_alignStart="@+id/DegreeOut" />
+        android:layout_toStartOf="@+id/stop_updates_button"
+        android:layout_above="@+id/textView"
+        android:layout_alignParentEnd="true" />
 
 </RelativeLayout>

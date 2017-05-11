@@ -48,6 +48,8 @@ public class MainActivity extends AppCompatActivity {
     TextView TV2;
     TextView TV3;
     TextView TV4;
+    TextView MyCartText;
+
     EditText DegVal;
     EditText RadVal;
     EditText OffsetVal;
@@ -70,7 +72,7 @@ public class MainActivity extends AppCompatActivity {
     String StringOfDataFinalIB = "";
     private static final int REQUEST_ENABLE_BT = 1;
 
-    int maxReadings = 0;
+    int maxReadings = 4;
 
     private static final long SCAN_PERIOD = 100000;
 
@@ -110,6 +112,7 @@ public class MainActivity extends AppCompatActivity {
         TV2 = (TextView) findViewById(R.id.textView2);
         TV3 = (TextView) findViewById(R.id.textView3);
         TV4 = (TextView) findViewById(R.id.textView4);
+        MyCartText = (TextView) findViewById(R.id.CartText);
 
         RadiusOut = (TextView) findViewById(R.id.RadiusOut);
         DegreeOut = (TextView) findViewById(R.id.DegreeOut);
@@ -151,10 +154,10 @@ public class MainActivity extends AppCompatActivity {
         fileLines = fileContent.split("\n"); // split data with new line
         fileIndividual = (fileLines[1]).split(",");
 
-        SimBecVal1.setText( "-68" );
-        SimBecVal2.setText( "-72" );
-        SimBecVal3.setText( "-74" );
-        //-68,-70,-74,240.0,2.5,180.0
+        SimBecVal1.setText( "-74" );
+        SimBecVal2.setText( "-89" );
+        SimBecVal3.setText( "-72" );
+        //-74,-89,-72,30.0,9.0,0.0
         //fileIndividual = (fileLines[1]).split(",");  // break up line starts at 0
 
 
@@ -271,6 +274,15 @@ public class MainActivity extends AppCompatActivity {
         }
         invalidateOptionsMenu();
     }
+    public int findRSSIavg(int beacindex){
+        int avg = 0;
+        int aindex = 0;
+        for (aindex = 0; aindex < maxReadings; aindex++) {
+            avg += BeaconVal[beacindex][aindex];
+        }
+        avg = avg / maxReadings;
+        return avg;
+    }
 
     private BluetoothAdapter.LeScanCallback mLeScanCallback =
             new BluetoothAdapter.LeScanCallback() {
@@ -334,24 +346,33 @@ public class MainActivity extends AppCompatActivity {
                         TV2.setText("Uos6:   " + Integer.toString(rssi));
                         BeaconVal [1][ReadingIndex[1]] = rssi;
                         ReadingIndex[1]++;
-                        if (ReadingIndex[1]>maxReadings)
+                        if (ReadingIndex[1]>maxReadings) {
                             ReadingIndex[1] = 0;
+                        }
+                        //SimBecVal3.setText(Integer.toString(findRSSIavg(1)));
+                        SimBecVal3.setText(Integer.toString(rssi));
                     }
                     if (FoundMeasureIB.compareTo(MeasuredIbeacond2Rq) == 0) {
                         StringOfDataIB +="" + rssi;
                         TV3.setText("d2Rq:   " + Integer.toString(rssi));
                         BeaconVal [2][ReadingIndex[2]] = rssi;
                         ReadingIndex[2]++;
-                        if (ReadingIndex[2]>maxReadings)
+                        if (ReadingIndex[2]>maxReadings) {
                             ReadingIndex[2] = 0;
+                        }
+                        //SimBecVal2.setText(Integer.toString(findRSSIavg(2)));
+                        SimBecVal2.setText(Integer.toString((rssi)));
                     }
                     if (FoundMeasureIB.compareTo(MeasuredIbeaconpYEM) == 0) {
                         StringOfDataIB +="" + rssi;
                         TV4.setText("pYEM:   " + Integer.toString(rssi));
                         BeaconVal [3][ReadingIndex[3]] = rssi;
                         ReadingIndex[3]++;
-                        if (ReadingIndex[3]>maxReadings)
+                        if (ReadingIndex[3]>maxReadings) {
                             ReadingIndex[3] = 0;
+                        }
+                        //SimBecVal1.setText(Integer.toString(findRSSIavg(3)));
+                        SimBecVal1.setText(Integer.toString((rssi)));
                     }
 
                     if ((FoundMeasureUID.compareTo(MeasuredEddyUID) == 0) |
@@ -368,8 +389,10 @@ public class MainActivity extends AppCompatActivity {
                             }
                         });
                     }
+
                 }
             };
+
 
     public void startUpdatesButtonHandler(View view) {
         scanLeDevice(true);
@@ -541,23 +564,32 @@ public class MainActivity extends AppCompatActivity {
         foundDeg = 0;
         float SinSum = 0;
         float CosSum = 0;
+        float xSum = 0;
+        float ySum = 0;
         if (weightHold == -1){  // set to perfect match
             foundDeg = Lowest4[0][1];
             foundRadius = Lowest4[0][2];
+            ySum = (float)((foundRadius*sin(Math.toRadians(foundDeg))));
+            xSum = (float)((foundRadius*cos(Math.toRadians(foundDeg))));
             }
             else{   // take the weighted avg
                 for (lowindex=0; lowindex< Kneighors ; lowindex++) {
                     SinSum += ((1/Lowest4[lowindex][0])/weightHold)*(sin(Math.toRadians(Lowest4[lowindex][1])));
                     CosSum += ((1/Lowest4[lowindex][0])/weightHold)*(cos(Math.toRadians(Lowest4[lowindex][1])));
-                    Log.d("myTag", "angle: " + Lowest4[lowindex][1] + " Sin: " + SinSum + " Cos: " + CosSum);
+                    //Log.d("myTag", "angle: " + Lowest4[lowindex][1] + " Sin: " + SinSum + " Cos: " + CosSum);
+                    ySum += ((1/Lowest4[lowindex][0])/weightHold)*(Lowest4[lowindex][2]*sin(Math.toRadians(Lowest4[lowindex][1])));
+                    xSum += ((1/Lowest4[lowindex][0])/weightHold)*(Lowest4[lowindex][2]*cos(Math.toRadians(Lowest4[lowindex][1])));
                     foundRadius += ((1 / Lowest4[lowindex][0]) / weightHold) * (Lowest4[lowindex][2]);
                 }
-                Log.d("myTag","Sin: "+ SinSum+ " Cos: "+ CosSum );
+                //Log.d("myTag","Sin: "+ SinSum+ " Cos: "+ CosSum );
                 foundDeg = (float) toDegrees(atan2(SinSum,CosSum));
 
             }
         DegreeOut.setText("Degree:"+Float.toString(foundDeg));
         RadiusOut.setText("Radius:"+Float.toString(foundRadius));
+        MyCartText.setText("x"+ xSum +"\n" +"  y"+ySum );
+        //MyCartText.setText("x"+Double.toString(foundRadius*cos(Math.toRadians(foundDeg)))+"\n"
+         //       +"  y"+Double.toString(foundRadius*sin(Math.toRadians(foundDeg))) );
         // how you set your ouput text displays for testing
 
 
